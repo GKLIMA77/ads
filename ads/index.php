@@ -47,7 +47,7 @@ if ($res) {
       Para trocar: baixe um .mp4 de barbearia em pexels.com/videos
       e coloque na pasta do projeto como "hero.mp4"
     -->
-    <source src=https://videos.pexels.com/video-files/7686555/7686555-hd_1920_1080_24fps.mp4 type="video/mp4">
+    <source src=https://videos.pexels.com/video-files/5450148/5450148-uhd_2560_1440_30fps.mp4 type="video/mp4">
   </video>
 
   <!-- Overlay escuro sobre o vídeo -->
