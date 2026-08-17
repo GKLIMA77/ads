@@ -29,7 +29,7 @@ function badgeStatus(status) {
 }
 function badgeLojaStatus(status) {
     var _a;
-    const cores = { aprovado: "success", aprovada: "success", pendente: "warning text-dark", cancelado: "danger", cancelada: "danger" };
+    const cores = { aprovado: "success", pendente: "warning text-dark", cancelado: "danger" };
     return `<span class="badge bg-${(_a = cores[status]) !== null && _a !== void 0 ? _a : "secondary"}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
 }
 function getEl(id) {
@@ -409,25 +409,25 @@ window.excluirServico = async function (id) {
 // ── LOJA: PRODUTOS ────────────────────────────────────────────────────────────
 async function carregarLoja() {
     mostrarLoading(true);
-    const produtos = await buscarDados("produtos");
+    const dados = await buscarDados("produtos");
     mostrarLoading(false);
-    produtosCache = produtos !== null && produtos !== void 0 ? produtos : [];
+    produtosCache = dados !== null && dados !== void 0 ? dados : [];
     const tabelaProd = getEl("tabela-produtos");
     const vazioProd = getEl("msg-sem-produtos");
-    if (tabelaProd && vazioProd) {
-        vazioProd.classList.toggle("d-none", produtosCache.length > 0);
-        tabelaProd.innerHTML = produtosCache.map((p) => `
-      <tr>
-        <td><img class="admin-produto-thumb" src="${p.imagem || "https://via.placeholder.com/60"}" alt=""></td>
-        <td><strong>${p.nome}</strong><br><small class="text-secondary">${p.descricao || ""}</small></td>
-        <td>${formatarMoeda(parseFloat(p.preco))}</td>
-        <td>${badgeLojaStatus(p.status)}</td>
-        <td>
-          <button class="btn btn-sm btn-outline-warning me-1" onclick="editarProduto(${p.id})"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-sm btn-outline-danger" onclick="excluirProduto(${p.id})"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>`).join("");
-    }
+    if (!tabelaProd || !vazioProd)
+        return;
+    vazioProd.classList.toggle("d-none", produtosCache.length > 0);
+    tabelaProd.innerHTML = produtosCache.map((p) => `
+    <tr>
+      <td><img class="admin-produto-thumb" src="${p.imagem || "https://via.placeholder.com/60"}" alt=""></td>
+      <td><strong>${p.nome}</strong><br><small class="text-secondary">${p.descricao || ""}</small></td>
+      <td>${formatarMoeda(parseFloat(p.preco))}</td>
+      <td>${badgeLojaStatus(p.status)}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-warning me-1" onclick="editarProduto(${p.id})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-outline-danger" onclick="excluirProduto(${p.id})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join("");
 }
 window.abrirModalProduto = function () {
     const titulo = getEl("modal-prod-titulo");
