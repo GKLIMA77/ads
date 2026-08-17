@@ -1,0 +1,6 @@
+Cole aqui dentro o seu arquivo real banco_completo.sql
+(o que já tinha: tabelas, trigger BEFORE UPDATE, function
+fn_calcular_faturamento_cliente, procedures e views).
+
+Esse placeholder é só pra pasta não ficar vazia no zip -
+pode apagar depois de colar o arquivo real.

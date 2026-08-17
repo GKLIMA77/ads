@@ -1,0 +1,2 @@
+Cole aqui dentro o seu arquivo real style.css.
+Este placeholder é só pra pasta não ficar vazia no zip.
