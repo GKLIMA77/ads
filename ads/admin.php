@@ -77,6 +77,7 @@ include __DIR__ . '/includes/head-admin.php';
     <nav class="nav-side d-flex flex-column">
       <a href="#" class="nav-link active" data-tab="dashboard"><i class="fas fa-chart-bar me-2"></i>Dashboard</a>
       <a href="#" class="nav-link" data-tab="agendamentos"><i class="fas fa-calendar me-2"></i>Agendamentos</a>
+      <a href="#" class="nav-link" data-tab="clientes"><i class="fas fa-users me-2"></i>Clientes</a>
       <a href="#" class="nav-link" data-tab="servicos"><i class="fas fa-scissors me-2"></i>Serviços</a>
       <a href="#" class="nav-link" data-tab="loja"><i class="fas fa-store me-2"></i>Loja</a>
       <hr>
@@ -145,6 +146,21 @@ include __DIR__ . '/includes/head-admin.php';
       </div>
     </div>
 
+    <!-- CLIENTES -->
+    <div id="tab-clientes" class="tab-section d-none">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 class="section-title mb-0">Clientes</h2>
+        <button class="btn btn-gold" onclick="abrirModalCliente()"><i class="fas fa-plus me-2"></i>Novo Cliente</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover">
+          <thead><tr><th>#</th><th>Nome</th><th>Telefone</th><th>Email</th><th>Faturamento</th><th>Ações</th></tr></thead>
+          <tbody id="tabela-clientes"></tbody>
+        </table>
+        <div id="msg-sem-clientes" class="text-secondary text-center py-4 d-none">Nenhum cliente cadastrado.</div>
+      </div>
+    </div>
+
     <!-- SERVIÇOS -->
     <div id="tab-servicos" class="tab-section d-none">
       <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -210,6 +226,26 @@ include __DIR__ . '/includes/head-admin.php';
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
       <button type="button" class="btn btn-gold" onclick="salvarAgendamento()">Salvar</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal fade" id="modalCliente" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="modal-cli-titulo">Cliente</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cli-id">
+      <div class="mb-3"><label class="form-label">Nome</label><input type="text" id="cli-nome" class="form-control" placeholder="Nome do cliente"></div>
+      <div class="mb-3"><label class="form-label">Telefone</label><input type="text" id="cli-telefone" class="form-control" placeholder="(44) 99999-9999"></div>
+      <div class="mb-3"><label class="form-label">Email</label><input type="email" id="cli-email" class="form-control" placeholder="cliente@email.com"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      <button type="button" class="btn btn-gold" onclick="salvarCliente()">Salvar</button>
     </div>
   </div></div>
 </div>

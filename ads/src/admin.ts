@@ -27,10 +27,6 @@ declare global {
     editarServico: (id: number) => void;
     salvarServico: () => Promise<void>;
     excluirServico: (id: number) => Promise<void>;
-    abrirModalCategoria: () => void;
-    editarCategoria: (id: number) => void;
-    salvarCategoria: () => Promise<void>;
-    excluirCategoria: (id: number) => Promise<void>;
     abrirModalProduto: () => void;
     editarProduto: (id: number) => void;
     salvarProduto: () => Promise<void>;
@@ -65,16 +61,8 @@ interface Servico {
   ativo: "0" | "1";
 }
 
-interface Categoria {
-  id: number;
-  nome: string;
-  status: "pendente" | "aprovada" | "cancelada";
-}
-
 interface Produto {
   id: number;
-  categoria_id: string;
-  categoria_nome: string;
   nome: string;
   descricao: string;
   preco: string;
@@ -107,7 +95,6 @@ interface RespostaApi<T> {
 let agendamentosCache: Agendamento[] = [];
 let servicosCache: Servico[] = [];
 let clientesCache: Cliente[] = [];
-let categoriasCache: Categoria[] = [];
 let produtosCache: Produto[] = [];
 let filtroStatusAtual: string = "";
 
@@ -136,7 +123,7 @@ function badgeStatus(status: string): string {
 }
 
 function badgeLojaStatus(status: string): string {
-  const cores: Record<string, string> = { aprovado: "success", aprovada: "success", pendente: "warning text-dark", cancelado: "danger", cancelada: "danger" };
+  const cores: Record<string, string> = { aprovado: "success", pendente: "warning text-dark", cancelado: "danger" };
   return `<span class="badge bg-${cores[status] ?? "secondary"}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
 }
 
@@ -519,100 +506,32 @@ window.excluirServico = async function (id: number): Promise<void> {
   else alert("Não foi possível excluir: " + resultado.mensagem);
 };
 
-// ── LOJA: CATEGORIAS E PRODUTOS ──────────────────────────────────────────────
+// ── LOJA: PRODUTOS ────────────────────────────────────────────────────────────
 
 async function carregarLoja(): Promise<void> {
   mostrarLoading(true);
-  const [categorias, produtos] = await Promise.all([
-    buscarDados<Categoria[]>("categorias"),
-    buscarDados<Produto[]>("produtos"),
-  ]);
+  const dados = await buscarDados<Produto[]>("produtos");
   mostrarLoading(false);
 
-  categoriasCache = categorias ?? [];
-  produtosCache   = produtos ?? [];
-
-  const tabelaCat  = getEl("tabela-categorias");
-  const vazioCat   = getEl("msg-sem-categorias");
-  if (tabelaCat && vazioCat) {
-    vazioCat.classList.toggle("d-none", categoriasCache.length > 0);
-    tabelaCat.innerHTML = categoriasCache.map((c) => `
-      <tr>
-        <td>${c.id}</td><td>${c.nome}</td><td>${badgeLojaStatus(c.status)}</td>
-        <td>
-          <button class="btn btn-sm btn-outline-warning me-1" onclick="editarCategoria(${c.id})"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-sm btn-outline-danger" onclick="excluirCategoria(${c.id})"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>`).join("");
-  }
+  produtosCache = dados ?? [];
 
   const tabelaProd = getEl("tabela-produtos");
   const vazioProd  = getEl("msg-sem-produtos");
-  if (tabelaProd && vazioProd) {
-    vazioProd.classList.toggle("d-none", produtosCache.length > 0);
-    tabelaProd.innerHTML = produtosCache.map((p) => `
-      <tr>
-        <td><img class="admin-produto-thumb" src="${p.imagem || "https://via.placeholder.com/60"}" alt=""></td>
-        <td><strong>${p.nome}</strong><br><small class="text-secondary">${p.descricao || ""}</small></td>
-        <td>${p.categoria_nome}</td>
-        <td>${formatarMoeda(parseFloat(p.preco))}</td>
-        <td>${badgeLojaStatus(p.status)}</td>
-        <td>
-          <button class="btn btn-sm btn-outline-warning me-1" onclick="editarProduto(${p.id})"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-sm btn-outline-danger" onclick="excluirProduto(${p.id})"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>`).join("");
-  }
+  if (!tabelaProd || !vazioProd) return;
+
+  vazioProd.classList.toggle("d-none", produtosCache.length > 0);
+  tabelaProd.innerHTML = produtosCache.map((p) => `
+    <tr>
+      <td><img class="admin-produto-thumb" src="${p.imagem || "https://via.placeholder.com/60"}" alt=""></td>
+      <td><strong>${p.nome}</strong><br><small class="text-secondary">${p.descricao || ""}</small></td>
+      <td>${formatarMoeda(parseFloat(p.preco))}</td>
+      <td>${badgeLojaStatus(p.status)}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-warning me-1" onclick="editarProduto(${p.id})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-outline-danger" onclick="excluirProduto(${p.id})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join("");
 }
-
-function preencherSelectCategorias(selecionada: string = ""): void {
-  const select = getEl<HTMLSelectElement>("prod-categoria");
-  if (!select) return;
-  select.innerHTML = categoriasCache.map((c) =>
-    `<option value="${c.id}" ${String(c.id) === selecionada ? "selected" : ""}>${c.nome}</option>`
-  ).join("");
-}
-
-window.abrirModalCategoria = function (): void {
-  const titulo = getEl("modal-cat-titulo");
-  if (titulo) titulo.textContent = "Nova Categoria";
-  definirValorEl("cat-id", "");
-  definirValorEl("cat-nome", "");
-  definirValorEl("cat-status", "pendente");
-  abrirModal("modalCategoria");
-};
-
-window.editarCategoria = function (id: number): void {
-  const c = categoriasCache.find((x) => x.id === id);
-  if (!c) return;
-  const titulo = getEl("modal-cat-titulo");
-  if (titulo) titulo.textContent = "Editar Categoria";
-  definirValorEl("cat-id", String(c.id));
-  definirValorEl("cat-nome", c.nome);
-  definirValorEl("cat-status", c.status);
-  abrirModal("modalCategoria");
-};
-
-window.salvarCategoria = async function (): Promise<void> {
-  const id     = valorEl("cat-id");
-  const nome   = valorEl("cat-nome").trim();
-  const status = valorEl("cat-status");
-  if (!nome) { alert("Informe o nome da categoria."); return; }
-  const resultado = await enviarDados({ acao: "salvar_categoria", id, nome, status });
-  if (resultado.sucesso) {
-    fecharModal("modalCategoria");
-    carregarLoja();
-  } else {
-    alert("Erro: " + resultado.mensagem);
-  }
-};
-
-window.excluirCategoria = async function (id: number): Promise<void> {
-  if (!confirm("Excluir esta categoria? Ela precisa estar sem produtos.")) return;
-  const resultado = await enviarDados({ acao: "excluir_categoria", id });
-  if (resultado.sucesso) carregarLoja();
-  else alert(resultado.mensagem);
-};
 
 window.abrirModalProduto = function (): void {
   const titulo = getEl("modal-prod-titulo");
@@ -621,7 +540,6 @@ window.abrirModalProduto = function (): void {
     definirValorEl(id, "");
   });
   definirValorEl("prod-status", "pendente");
-  preencherSelectCategorias();
   abrirModal("modalProduto");
 };
 
@@ -636,20 +554,18 @@ window.editarProduto = function (id: number): void {
   definirValorEl("prod-preco", p.preco);
   definirValorEl("prod-imagem", p.imagem || "");
   definirValorEl("prod-status", p.status);
-  preencherSelectCategorias(String(p.categoria_id));
   abrirModal("modalProduto");
 };
 
 window.salvarProduto = async function (): Promise<void> {
-  const id          = valorEl("prod-id");
-  const nome        = valorEl("prod-nome").trim();
-  const preco       = parseFloat(valorEl("prod-preco"));
-  const categoria_id= valorEl("prod-categoria");
-  const descricao   = valorEl("prod-descricao").trim();
-  const imagem      = valorEl("prod-imagem").trim();
-  const status      = valorEl("prod-status");
-  if (!nome || !categoria_id || isNaN(preco) || preco <= 0) { alert("Preencha nome, categoria e preço válido."); return; }
-  const resultado = await enviarDados({ acao: "salvar_produto", id, nome, preco, categoria_id, descricao, imagem, status });
+  const id        = valorEl("prod-id");
+  const nome      = valorEl("prod-nome").trim();
+  const preco     = parseFloat(valorEl("prod-preco"));
+  const descricao = valorEl("prod-descricao").trim();
+  const imagem    = valorEl("prod-imagem").trim();
+  const status    = valorEl("prod-status");
+  if (!nome || isNaN(preco) || preco <= 0) { alert("Preencha nome e preço válido."); return; }
+  const resultado = await enviarDados({ acao: "salvar_produto", id, nome, preco, descricao, imagem, status });
   if (resultado.sucesso) {
     fecharModal("modalProduto");
     carregarLoja();
