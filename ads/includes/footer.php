@@ -11,8 +11,7 @@
     <div class="footer-redes">
 
       <!-- Instagram com @ correto -->
-      <a href="https://www.instagram.com/souza_barbershopp/" target="_blank" rel="noopener" aria-label="Instagram @souza_barbershopp
-" class="footer-rede">
+      <a href="https://www.instagram.com/souza_barbershopp/" target="_blank" rel="noopener" aria-label="Instagram @souza_barbershopp" class="footer-rede">
         <i class="fa-brands fa-instagram"></i>
       </a>
 
@@ -31,13 +30,11 @@
     <!-- Instagram visível como texto -->
     <p class="footer-insta">
       <i class="fa-brands fa-instagram me-1"></i>
-      <a href="https://instagram.com/adrian_souza" target="_blank" rel="noopener">@souza_barbershopp
-</a>
+      <a href="https://www.instagram.com/souza_barbershopp/" target="_blank" rel="noopener">@souza_barbershopp</a>
     </p>
 
-    <!-- Copyright + botão admin -->
+    <!-- Botão admin -->
     <div class="footer-bottom">
-      <p class="footer-copy">&copy; <?php echo date('Y'); ?> Barbearia Adrian Souza &mdash; Todos os direitos reservados.</p>
       <a href="admin.php" class="footer-admin-btn">
         <i class="fas fa-lock"></i> Área Admin
       </a>
